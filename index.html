@@ -6,63 +6,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Primary Meta Tags -->
-  <!-- TODO: Replace with your paper title and author names -->
-  <meta name="title" content="CoRe">
-  <!-- TODO: Write a compelling 150-160 character description of your research -->
+  <meta name="title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
   <meta name="description"
-    content="This paper introduces Context-Robust Remasking (CoRe), a training-free inference-time method that improves decoding in masked diffusion models (MDMs) by addressing context rigidity. In standard diffusion decoding, early token predictions are often made under incomplete context yet become fixed constraints, leading to cascading structural errors. Existing remasking strategies rely on static confidence scores, which are frequently stale and fail to identify tokens that later become inconsistent. CoRe instead reframes revision as a robustness problem: it identifies context-brittle tokens by measuring how sensitive each token is to adversarial perturbations of its surrounding context. Tokens whose likelihood collapses under these perturbations are prioritized for revision. CoRe efficiently approximates this worst-case instability with a lightweight stress test requiring minimal additional computation. Experiments on LLaDA-8B show consistent improvements across reasoning and code benchmarks.">
-  <!-- TODO: Add 5-10 relevant keywords for your research area -->
-  <meta name="keywords" content="Diffusion language models, Inference-time revision, Robustness, computer vision, AI">
-  <!-- TODO: List all authors -->
-  <meta name="author" content="Kevin Zhai, Sabbir Mollah, Zhenyi Wang, Mubarak Shah">
+    content="CORE is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
+  <meta name="keywords"
+    content="diffusion language models, masked diffusion models, inference-time revision, remasking, robustness, self-correction, LLaDA, code generation, reasoning">
+  <meta name="author" content="Anonymous Authors">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
 
-  <!-- Open Graph / Facebook -->
+  <!-- Canonical URL for GitHub Pages (update if you move domains) -->
+  <link rel="canonical" href="https://ucf-crcv.github.io/CoRe/">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
-  <!-- TODO: Replace with your institution or lab name -->
-  <meta property="og:site_name" content="University of Central Florida">
-  <!-- TODO: Same as paper title above -->
-  <meta property="og:title" content="CoRe: Context-Robust Remasking for Diffusion Language Models">
-  <!-- TODO: Same as description above -->
+  <meta property="og:site_name" content="CORE Project Page">
+  <meta property="og:title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
   <meta property="og:description"
-    content="This paper introduces Context-Robust Remasking (CoRe), a training-free inference-time method that improves decoding in masked diffusion models (MDMs) by addressing context rigidity. In standard diffusion decoding, early token predictions are often made under incomplete context yet become fixed constraints, leading to cascading structural errors. Existing remasking strategies rely on static confidence scores, which are frequently stale and fail to identify tokens that later become inconsistent. CoRe instead reframes revision as a robustness problem: it identifies context-brittle tokens by measuring how sensitive each token is to adversarial perturbations of its surrounding context. Tokens whose likelihood collapses under these perturbations are prioritized for revision. CoRe efficiently approximates this worst-case instability with a lightweight stress test requiring minimal additional computation. Experiments on LLaDA-8B show consistent improvements across reasoning and code benchmarks.">
-  <!-- TODO: Replace with your actual website URL -->
-  <meta property="og:url" content="https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE">
-  <!-- TODO: Create a 1200x630px preview image and update path -->
-  <meta property="og:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="PAPER_TITLE - Research Preview">
-  <meta property="article:published_time" content="2024-01-01T00:00:00.000Z">
-  <meta property="article:author" content="FIRST_AUTHOR_NAME">
-  <meta property="article:section" content="Research">
-  <meta property="article:tag" content="KEYWORD1">
-  <meta property="article:tag" content="KEYWORD2">
+    content="CORE is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
+  <meta property="og:url" content="https://ucf-crcv.github.io/CoRe/">
+  <meta property="og:image" content="https://ucf-crcv.github.io/CoRe/static/images/main_figure.png">
+  <meta property="og:image:alt" content="CORE - Research Preview">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <!-- TODO: Replace with your lab/institution Twitter handle -->
-  <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE">
-  <!-- TODO: Replace with first author's Twitter handle -->
-  <meta name="twitter:creator" content="@AUTHOR_TWITTER_HANDLE">
-  <!-- TODO: Same as paper title above -->
-  <meta name="twitter:title" content="PAPER_TITLE">
-  <!-- TODO: Same as description above -->
-  <meta name="twitter:description" content="BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS">
-  <!-- TODO: Same as social preview image above -->
-  <meta name="twitter:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
-  <meta name="twitter:image:alt" content="PAPER_TITLE - Research Preview">
+  <meta name="twitter:title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
+  <meta name="twitter:description"
+    content="Training-free inference-time revision for masked diffusion language models via jointly-masked context perturbations.">
+  <meta name="twitter:image" content="https://ucf-crcv.github.io/CoRe/static/images/main_figure.png">
+  <meta name="twitter:image:alt" content="CORE - Research Preview">
 
-  <!-- Academic/Research Specific -->
-  <meta name="citation_title" content="PAPER_TITLE">
-  <meta name="citation_author" content="FIRST_AUTHOR_LAST, FIRST_AUTHOR_FIRST">
-  <meta name="citation_author" content="SECOND_AUTHOR_LAST, SECOND_AUTHOR_FIRST">
-  <meta name="citation_publication_date" content="2024">
-  <meta name="citation_conference_title" content="CONFERENCE_NAME">
-  <meta name="citation_pdf_url" content="https://YOUR_DOMAIN.com/static/pdfs/paper.pdf">
-
-  <!-- Additional SEO -->
+  <!-- Additional SEO / UI -->
   <meta name="theme-color" content="#2563eb">
   <meta name="msapplication-TileColor" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,27 +46,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://ajax.googleapis.com">
-  <link rel="preconnect" href="https://documentcloud.adobe.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-
-  <!-- TODO: Replace with your paper title and authors -->
-  <title>PAPER_TITLE - AUTHOR_NAMES | Academic Research</title>
+  <title>CORE: Context-Robust Remasking for Diffusion Language Models | Project Page</title>
 
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/amendment.png">
   <link rel="apple-touch-icon" href="https://img.icons8.com/color/48/amendment.png">
 
-  <!-- Critical CSS - Load synchronously -->
+  <!-- Critical CSS -->
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/index.css">
 
-  <!-- Non-critical CSS - Load asynchronously -->
-  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style"
-    onload="this.onload=null;this.rel='stylesheet'">
+  <!-- Non-critical CSS -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style"
-    onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
 
@@ -104,274 +73,125 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   </noscript>
 
-  <!-- Fonts - Optimized loading -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Defer non-critical JavaScript -->
+  <!-- Defer JavaScript -->
   <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
   <script defer src="static/js/fontawesome.all.min.js"></script>
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/bulma-slider.min.js"></script>
   <script defer src="static/js/index.js"></script>
-
-  <!-- Structured Data for Academic Papers -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
-    "headline": "PAPER_TITLE",
-    "description": "BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS",
-    "author": [
-      {
-        "@type": "Person",
-        "name": "FIRST_AUTHOR_NAME",
-        "affiliation": {
-          "@type": "Organization",
-          "name": "INSTITUTION_NAME"
-        }
-      },
-      {
-        "@type": "Person",
-        "name": "SECOND_AUTHOR_NAME",
-        "affiliation": {
-          "@type": "Organization",
-          "name": "INSTITUTION_NAME"
-        }
-      }
-    ],
-    "datePublished": "2024-01-01",
-    "publisher": {
-      "@type": "Organization",
-      "name": "CONFERENCE_OR_JOURNAL_NAME"
-    },
-    "url": "https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE",
-    "image": "https://YOUR_DOMAIN.com/static/images/social_preview.png",
-    "keywords": ["KEYWORD1", "KEYWORD2", "KEYWORD3", "machine learning", "computer vision"],
-    "abstract": "FULL_ABSTRACT_TEXT_HERE",
-    "citation": "BIBTEX_CITATION_HERE",
-    "isAccessibleForFree": true,
-    "license": "https://creativecommons.org/licenses/by/4.0/",
-    "mainEntity": {
-      "@type": "WebPage",
-      "@id": "https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE"
-    },
-    "about": [
-      {
-        "@type": "Thing",
-        "name": "RESEARCH_AREA_1"
-      },
-      {
-        "@type": "Thing", 
-        "name": "RESEARCH_AREA_2"
-      }
-    ]
-  }
-  </script>
-
-  <!-- Website/Organization Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "INSTITUTION_OR_LAB_NAME",
-    "url": "https://YOUR_INSTITUTION_WEBSITE.com",
-    "logo": "https://YOUR_DOMAIN.com/static/images/favicon.ico",
-    "sameAs": [
-      "https://twitter.com/YOUR_TWITTER_HANDLE",
-      "https://github.com/YOUR_GITHUB_USERNAME"
-    ]
-  }
-  </script>
 </head>
 
 <body>
-
 
   <!-- Scroll to Top Button -->
   <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
     <i class="fas fa-chevron-up"></i>
   </button>
 
-  <!-- More Works Dropdown -->
-  <div class="more-works-container">
-    <button class="more-works-btn" onclick="toggleMoreWorks()" title="View More Works from Our Lab">
-      <i class="fas fa-flask"></i>
-      More Works
-      <i class="fas fa-chevron-down dropdown-arrow"></i>
-    </button>
-    <div class="more-works-dropdown" id="moreWorksDropdown">
-      <div class="dropdown-header">
-        <h4>More Works from Our Lab</h4>
-        <button class="close-btn" onclick="toggleMoreWorks()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="works-list">
-        <!-- TODO: Replace with your lab's related works -->
-        <a href="https://arxiv.org/abs/PAPER_ID_1" class="work-item" target="_blank">
-          <div class="work-info">
-            <!-- TODO: Replace with actual paper title -->
-            <h5>Paper Title 1</h5>
-            <!-- TODO: Replace with brief description -->
-            <p>Brief description of the work and its main contribution.</p>
-            <!-- TODO: Replace with venue and year -->
-            <span class="work-venue">Conference/Journal 2024</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <!-- TODO: Add more related works or remove extra items -->
-        <a href="https://arxiv.org/abs/PAPER_ID_2" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 2</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <a href="https://arxiv.org/abs/PAPER_ID_3" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 3</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-
   <main id="main-content">
+
     <section class="hero">
       <div class="hero-body">
         <div class="container is-max-desktop">
           <div class="columns is-centered">
             <div class="column has-text-centered">
-              <!-- TODO: Replace with your paper title -->
-              <h1 class="title is-1 publication-title">CoRe: Context-Robust Remasking for Diffusion Language Models</h1>
+
+              <h1 class="title is-1 publication-title">CORE: Context-Robust Remasking for Diffusion Language Models</h1>
+
               <div class="is-size-5 publication-authors">
-                <!-- TODO: Replace with your paper authors and their personal links -->
-                <span class="author-block">
-                  <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">Kevin Zhai</a>,</span>
-                <span class="author-block">
-                  <a href="https:www.mollahsabbir.com" target="_blank">Sabbir Mollah</a>,</span>
-                <span class="author-block">
-                  <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Zhenyi Wang</a>
-                </span>
-                <span class="author-block">
-                  <a href="Fourth AUTHOR PERSONAL LINK" target="_blank">Mubarak Shah</a>
-                </span>
+                <span class="author-block">Anonymous Authors</span>
               </div>
 
               <div class="is-size-5 publication-authors">
-                <!-- TODO: Replace with your institution and conference/journal info -->
-                <span class="author-block">University of Central Florida<br>-</span>
-                <!-- TODO: Remove this line if no equal contribution -->
-                <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                <span class="author-block">ICML 2026 Submission</span>
               </div>
 
               <div class="column has-text-centered">
                 <div class="publication-links">
-                  <!-- TODO: Update with your arXiv paper ID -->
-                  <!-- <span class="link-block">
-                    <a href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf" target="_blank"
+
+                  <!-- Add once public -->
+                  <!--
+                  <span class="link-block">
+                    <a href="static/pdfs/paper.pdf" target="_blank"
                       class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
                       <span>Paper</span>
                     </a>
-                  </span> -->
+                  </span>
+                  -->
 
-                  <!-- TODO: Add your supplementary material PDF or remove this section -->
-                  <!-- <span class="link-block">
-                    <a href="static/pdfs/supplementary_material.pdf" target="_blank"
+                  <span class="link-block">
+                    <a href="https://github.com/UCF-CRCV/CoRe" target="_blank"
                       class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
-                      <span>Supplementary</span>
-                    </a>
-                  </span> -->
-
-                  <!-- TODO: Replace with your GitHub repository URL -->
-                  <!-- <span class="link-block">
-                    <a href="https://github.com/YOUR REPO HERE" target="_blank"
-                      class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fab fa-github"></i>
-                      </span>
+                      <span class="icon"><i class="fab fa-github"></i></span>
                       <span>Code</span>
                     </a>
-                  </span> -->
+                  </span>
 
-                  <!-- TODO: Update with your arXiv paper ID -->
+                  <!-- Add once public -->
+                  <!--
                   <span class="link-block">
-                    <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
+                    <a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank"
                       class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="ai ai-arxiv"></i>
-                      </span>
+                      <span class="icon"><i class="ai ai-arxiv"></i></span>
                       <span>arXiv</span>
                     </a>
                   </span>
+                  -->
+
                 </div>
               </div>
+
             </div>
           </div>
         </div>
       </div>
     </section>
 
-
-    <!-- Teaser video-->
+    <!-- Teaser -->
     <section class="hero teaser">
       <div class="container is-max-desktop">
         <div class="hero-body">
-          <!-- TODO: Replace with your teaser video -->
           <img id="tree" src="static/images/main_figure.png" alt="Main figure" style="height:100%; width:auto;">
-
-          <!-- TODO: Replace with your video description -->
           <h2 class="subtitle has-text-centered">
-            This paper introduces Context-Robust Remasking (CoRe), a training-free inference-time method that improves
-            decoding in masked diffusion models (MDMs) by addressing context rigidity.
+            CORE is a training-free inference-time revision method for masked diffusion language models that identifies
+            context-brittle tokens by stress-testing them under jointly-masked context perturbations.
           </h2>
         </div>
       </div>
     </section>
-    <!-- End teaser video -->
 
-    <!-- Paper abstract -->
+    <!-- Abstract -->
     <section class="section hero is-light">
       <div class="container is-max-desktop">
         <div class="columns is-centered has-text-centered">
           <div class="column is-four-fifths">
             <h2 class="title is-3">Abstract</h2>
             <div class="content has-text-justified">
-              <!-- TODO: Replace with your paper abstract -->
               <p>
                 Standard decoding in Masked Diffusion Models (MDMs) is hindered by context rigidity: tokens are retained
                 based on transient high confidence, often ignoring that early predictions lack full context. This
                 creates cascade effects where initial inconsistencies misguide the remaining generation. Existing
                 revision strategies attempt to mitigate this by relying on static confidence scores, but these signals
                 are inherently myopic; inconsistent tokens frequently appear confident to the model itself. To address
-                this, we propose Context-Robust Remasking (CoRe), a training-free framework for inference-time revision.
+                this, we propose Context-Robust Remasking (CORE), a training-free framework for inference-time revision.
                 We introduce a new selection paradigm: rather than trusting static token probabilities, we identify
                 context-brittle tokens by probing their sensitivity to adversarial perturbations. We formalize revision
-                as a robust optimization problem targeting worst-case context shifts. CoRe efficiently approximates this
-                objective to expose unstable tokens, prioritizing them for revision. On LLaDA-8B-Base, CoRe delivers
-                consistent improvements across reasoning and code benchmarks, outperforming compute-matched baselines
-                and boosting performance on code generation (MBPP) by up to 9.2%
+                as a robust optimization problem targeting worst-case context shifts. CORE efficiently approximates this
+                objective to expose unstable tokens, prioritizing them for revision. On LLaDA-8B-Base, CORE delivers
+                consistent improvements across reasoning and code benchmarks, boosting performance on code generation
+                (MBPP) by up to +9.2%.
               </p>
             </div>
           </div>
         </div>
       </div>
     </section>
-    <!-- End paper abstract -->
 
-
-    <!-- TL;DR / Contributions -->
+    <!-- TL;DR -->
     <section class="section">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
@@ -383,8 +203,8 @@
                 <div class="box">
                   <h3 class="title is-5">Problem</h3>
                   <p>
-                    Early tokens, generated under partial context, in masked diffusion decoding get “locked in”,
-                    causing cascading structural errors.
+                    In masked diffusion decoding, early token choices made under partial context can later become
+                    inconsistent, causing cascading structural errors.
                   </p>
                 </div>
               </div>
@@ -393,8 +213,8 @@
                 <div class="box">
                   <h3 class="title is-5">Idea</h3>
                   <p>
-                    Identify context-brittle tokens by stress-testing them under perturbed context,
-                    and remask them for revision.
+                    Identify context-brittle tokens by stress-testing their support under jointly-masked context
+                    perturbations, then remask only those tokens for revision.
                   </p>
                 </div>
               </div>
@@ -403,7 +223,8 @@
                 <div class="box">
                   <h3 class="title is-5">Method</h3>
                   <p>
-                    Mask a candidate subset, compute instability scores, and revise only the most unstable tokens.
+                    Restrict attention to a small candidate subset, apply a group-masked perturbation, score instability,
+                    and revise the most unstable tokens.
                   </p>
                 </div>
               </div>
@@ -412,7 +233,8 @@
                 <div class="box">
                   <h3 class="title is-5">Outcome</h3>
                   <p>
-                    More consistent decoding, especially on structure-sensitive tasks (e.g., code, math reasoning).
+                    Largest gains appear on structure-sensitive tasks (e.g., code), where brittle early decisions can
+                    propagate widely.
                   </p>
                 </div>
               </div>
@@ -422,11 +244,8 @@
         </div>
       </div>
     </section>
-    <!-- End TL;DR / Contributions -->
 
-
-
-    <!-- Trace Viewer (Collapsible) -->
+    <!-- Qualitative Examples (kept as-is; populate via trace JSON/assets) -->
     <section class="section hero is-light" id="trace-viewer">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
@@ -463,10 +282,8 @@
                   </div>
 
                   <div class="trace-meta-row" id="traceMetaRow" style="display:none;">
-                    <span class="trace-pill"><span class="trace-dot m2u"></span><span
-                        id="traceM2UCount">0</span>&nbsp;mask→unmask</span>
-                    <span class="trace-pill"><span class="trace-dot u2m"></span><span
-                        id="traceRevCount">0</span>&nbsp;revisions</span>
+                    <span class="trace-pill"><span class="trace-dot m2u"></span><span id="traceM2UCount">0</span>&nbsp;mask→unmask</span>
+                    <span class="trace-pill"><span class="trace-dot u2m"></span><span id="traceRevCount">0</span>&nbsp;revisions</span>
                     <span class="trace-pill">block <b id="traceBlockLabel">—</b></span>
                     <span class="trace-pill">inner step <b id="traceInnerStepLabel">—</b></span>
                     <span class="trace-pill">sample <b id="traceSampleLabel">—</b></span>
@@ -497,10 +314,6 @@
         </div>
       </div>
     </section>
-    <!-- End Trace Viewer -->
-
-
-
 
     <!-- Method Overview -->
     <section class="section hero is-light">
@@ -511,15 +324,14 @@
 
             <div class="content">
               <p>
-                CoRe revises tokens based on <b>context brittleness</b>: if a token’s likelihood collapses when its
-                context
-                is perturbed, it’s prioritized for revision.
+                CORE prioritizes tokens based on <b>context brittleness</b>: if the current token loses support under a
+                jointly-masked perturbed context, it is a strong candidate for revision.
               </p>
 
               <ol>
-                <li><b>Pick candidate set</b> of tokens to perturb based on top-2 margin.</li>
-                <li><b>Perturb context</b> by masking the candidate set.</li>
-                <li><b>Score instability</b> of each token in the candidate set under the perturbed context.</li>
+                <li><b>Select a small candidate subset</b> using a lightweight uncertainty proxy (e.g., small top-2 margin).</li>
+                <li><b>Perturb context</b> by masking the candidate subset jointly.</li>
+                <li><b>Score instability</b> by evaluating each current token’s likelihood under the perturbed pass.</li>
                 <li><b>Revise</b> the most unstable tokens using predictions from the perturbed pass.</li>
               </ol>
             </div>
@@ -529,8 +341,8 @@
                 <div class="box">
                   <h3 class="title is-5">Candidate Selection</h3>
                   <p>
-                    CoRe restricts perturbation to a small candidate set selected via top-2 margin,
-                    ensuring that only ambiguous tokens are evaluated while keeping computation minimal.
+                    To control compute, CORE restricts scoring to a small candidate set proposed by a cheap heuristic
+                    (e.g., top-2 margin), then applies a stronger robustness test only to those positions.
                   </p>
                 </div>
               </div>
@@ -539,8 +351,8 @@
                 <div class="box">
                   <h3 class="title is-5">Context Perturbation</h3>
                   <p>
-                    By masking the candidate set, CoRe creates a controlled worst-case context shift
-                    that exposes hidden dependencies between tokens and their surrounding context.
+                    Jointly masking the candidate set creates a controlled context shift that exposes conditional
+                    dependencies and hidden structural roles.
                   </p>
                 </div>
               </div>
@@ -549,8 +361,8 @@
                 <div class="box">
                   <h3 class="title is-5">Instability Scoring</h3>
                   <p>
-                    Tokens are ranked by the drop in likelihood between the original and perturbed passes,
-                    providing a dynamic, context-aware signal for revision.
+                    CORE ranks candidates by how well the <em>current</em> token is supported under the jointly-masked
+                    perturbed context (the masked-context support signal).
                   </p>
                 </div>
               </div>
@@ -559,23 +371,17 @@
                 <div class="box">
                   <h3 class="title is-5">Selective Revision</h3>
                   <p>
-                    Only the most unstable tokens are remasked and regenerated,
-                    preventing unnecessary disruption of stable parts of the sequence.
+                    Only the most unstable tokens are remasked and regenerated, preserving stable regions while fixing
+                    brittle dependencies.
                   </p>
                 </div>
               </div>
             </div>
 
-
-
           </div>
         </div>
       </div>
     </section>
-    <!-- End Method Overview -->
-
-
-
 
     <!-- Results -->
     <section class="section" id="results">
@@ -586,16 +392,14 @@
 
             <div class="content">
               <p>
-                Across all benchmarks, CoRe consistently improves performance over both confidence-based and
-                margin-based revision strategies. The gains are especially pronounced on structure-sensitive code
-                generation tasks such as HumanEval and MBPP, where CoRe substantially reduces cascading errors
-                introduced by early, brittle token decisions. These improvements hold across different base selection
-                schemes, demonstrating that robustness-based remasking is complementary to existing confidence
-                heuristics.
+                CORE improves over the base sampler and shows its largest gains on structure-sensitive code benchmarks.
+                Notably, the confidence-based baseline (ReMDM-conf) can degrade code performance under some unmasking
+                strategies, while CORE yields consistent improvements on HumanEval and MBPP. On GSM8K, CORE remains
+                competitive and does not trade away reasoning accuracy for code gains.
               </p>
             </div>
 
-            <!-- ===== Table A (two-block table) ===== -->
+            <!-- ===== Table 1 ===== -->
             <h3 class="title is-5">Table 1: Accuracy (%) (# Few-Shot)</h3>
             <div class="table-container">
               <table class="table is-fullwidth is-hoverable">
@@ -611,7 +415,6 @@
                 </thead>
 
                 <tbody>
-                  <!-- Low-Confidence block -->
                   <tr>
                     <td><b>Low-Confidence Base</b></td>
                     <td class="has-text-centered">51.40</td>
@@ -629,7 +432,7 @@
                     <td class="has-text-centered">15.20</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered"><b>52.69</b></td>
                     <td class="has-text-centered"><b>17.06</b></td>
                     <td class="has-text-centered"><b>47.18</b><sup>*</sup></td>
@@ -637,12 +440,10 @@
                     <td class="has-text-centered"><b>24.80</b><sup>*</sup></td>
                   </tr>
 
-                  <!-- spacer / divider row -->
                   <tr>
                     <td colspan="6" style="border-top: 2px solid rgba(0,0,0,0.15);"></td>
                   </tr>
 
-                  <!-- Top-k Margin block -->
                   <tr>
                     <td><b>Top-k Margin Base</b></td>
                     <td class="has-text-centered">50.27</td>
@@ -660,7 +461,7 @@
                     <td class="has-text-centered">14.80</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered">51.40</td>
                     <td class="has-text-centered"><b>18.34</b></td>
                     <td class="has-text-centered"><b>49.01</b></td>
@@ -672,14 +473,14 @@
             </div>
 
             <p class="is-size-7 has-text-grey">
-              Values are accuracy (%). Parentheses indicate the number of few-shot examples. <sup>*</sup> indicates the
-              best
-              result in that block. <sup>†</sup> follows the notation from the paper.
+              Values are accuracy (%). Parentheses indicate the number of few-shot examples.
+              <sup>*</sup> denotes statistically significant improvements over the best baseline in that block.
+              <sup>†</sup> ReMDM-conf follows the notation in the paper.
             </p>
 
             <hr>
 
-            <!-- ===== Table B (revision strategy comparison) ===== -->
+            <!-- ===== Table 2 ===== -->
             <h3 class="title is-5">Table 2: Accuracy (%) (# Few-Shot)</h3>
             <div class="table-container">
               <table class="table is-fullwidth is-hoverable">
@@ -719,7 +520,7 @@
                     <td class="has-text-centered">17.40</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered"><b>52.69</b></td>
                     <td class="has-text-centered"><b>17.06</b></td>
                     <td class="has-text-centered"><b>47.18</b></td>
@@ -731,21 +532,15 @@
             </div>
 
             <p class="is-size-7 has-text-grey">
-              Revision strategy comparison on the Low-Confidence Base.
+              Selection-mechanism controls under Low-Confidence unmasking (compute-matched).
             </p>
 
           </div>
         </div>
       </div>
     </section>
-    <!-- End Results -->
 
-
-
-
-
-
-    <!--BibTex citation -->
+    <!-- BibTeX -->
     <section class="section" id="BibTeX">
       <div class="container is-max-desktop content">
         <div class="bibtex-header">
@@ -755,46 +550,37 @@
             <span class="copy-text">Copy</span>
           </button>
         </div>
-        <pre id="bibtex-code"><code>@article{YourPaperKey2024,
-  title={Your Paper Title Here},
-  author={First Author and Second Author and Third Author},
-  journal={Conference/Journal Name},
-  year={2024},
-  url={https://your-domain.com/your-project-page}
+        <pre id="bibtex-code"><code>@misc{core2026,
+  title        = {CORE: Context-Robust Remasking for Diffusion Language Models},
+  author       = {Anonymous Authors},
+  year         = {2026},
+  note         = {ICML 2026 submission},
+  howpublished = {\url{https://ucf-crcv.github.io/CoRe/}}
 }</code></pre>
       </div>
     </section>
-    <!--End BibTex citation -->
-
 
     <footer class="footer">
       <div class="container">
         <div class="columns is-centered">
           <div class="column is-8">
             <div class="content">
-
               <p>
                 This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                  target="_blank">Academic Project Page Template</a> which was adopted from the <a
-                  href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
-                You are free to borrow the source code of this website, we just ask that you link back to this page in
-                the footer. <br> This website is licensed under a <a rel="license"
+                  target="_blank">Academic Project Page Template</a> which was adopted from the <a
+                  href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+                You are free to borrow the source code of this website; please link back to the template in your footer.
+                <br> This website is licensed under a <a rel="license"
                   href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
                   Commons Attribution-ShareAlike 4.0 International License</a>.
               </p>
-
             </div>
           </div>
         </div>
       </div>
     </footer>
 
-    <!-- Statcounter tracking code -->
-
-    <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
-
-    <!-- End of Statcounter Code -->
-
+  </main>
 </body>
 
 </html>
