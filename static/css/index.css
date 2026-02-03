@@ -977,6 +977,7 @@ a:focus {
 /* collapsed = half visible */
 #trace-viewer .trace-collapsible.is-collapsed .trace-collapsible-body{
   max-height: 360px; /* change this height for more/less reveal */
+  overflow: hidden;
 }
 
 /* expanded */
