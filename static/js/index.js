@@ -145,16 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setState(false);
 
-    header.addEventListener("click", (e) => {
+    const toggle = (e) => {
       e.preventDefault();
       e.stopPropagation();
       const expanded = wrap.classList.contains("is-expanded");
       setState(!expanded);
-    });
-
-    wrap.addEventListener("pointerdown", () => {
-      if (wrap.classList.contains("is-collapsed")) setState(true);
-    });
+    };
+    
+    header.addEventListener("click", toggle);
+    hint.addEventListener("click", toggle);
 
     wrap.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -163,10 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setState(!expanded);
       }
       if (e.key === "Escape") setState(false);
-    });
-
-    wrap.addEventListener("focusin", () => {
-      if (wrap.classList.contains("is-collapsed")) setState(true);
     });
 
     document.addEventListener("pointerdown", (e) => {
