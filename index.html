@@ -194,7 +194,7 @@
                 are inherently myopic; inconsistent tokens frequently appear confident to the model itself. To address
                 this, we propose Context-Robust Remasking (CoRe), a training-free framework for inference-time revision.
                 We introduce a new selection paradigm: rather than trusting static token probabilities, we identify
-                context-brittle tokens by probing their sensitivity to adversarial perturbations. We formalize revision
+                context-brittle tokens by probing their sensitivity to targeted perturbations. We formalize revision
                 as a robust optimization problem targeting worst-case context shifts. CoRe efficiently approximates this
                 objective to expose unstable tokens, prioritizing them for revision. On LLaDA-8B-Base, CoRe delivers
                 consistent improvements across reasoning and code benchmarks, boosting performance on code generation
