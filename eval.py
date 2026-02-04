@@ -210,7 +210,7 @@ class LLaDAEvalHarness(LM):
         prefix, target = prefix.to(self.device), target.to(self.device)
         seq[0, :len(prefix)] = prefix
 
-        for i in range(len(target)):
+        for _ in range(len(target)):
             mask_index = (seq == self.mask_id)
             logits = self.get_logits(seq, prompt_index)[mask_index]
             x0 = torch.argmax(logits, dim=-1)
@@ -220,6 +220,7 @@ class LLaDAEvalHarness(LM):
             _, index = torch.sort(confidence, descending=True)
             x0[index[1:]] = self.mask_id
             seq[mask_index] = x0.clone()
+
         correct = target == seq[0, len(prefix):]
         correct = torch.all(correct)
         return correct
@@ -268,6 +269,7 @@ class LLaDAEvalHarness(LM):
                 is_target_greedy_dec = self.suffix_greedy_prediction(prefix, target)
 
                 out.append((ll, 1.0 if is_target_greedy_dec else 0.0))
+
         torch.cuda.empty_cache()
         return out
 
@@ -299,21 +301,21 @@ class LLaDAEvalHarness(LM):
             Path(mech_save_dir).mkdir(parents=True, exist_ok=True)
 
             mech_all = {
-                "pll_verified_kept": [],
-                "pll_verified_remasked": [],
-                "pll_remasked_changed": [],
-                "pll_remasked_unchanged": [],
+                "verified_kept": [],
+                "verified_remasked": [],
+                "remasked_changed": [],
+                "remasked_unchanged": [],
                 "delta_remasked": [],
                 "margin_verified_kept": [],
                 "margin_verified_remasked": []
             }
             stats_all = {
-                "pll_verify_calls": 0,
-                "pll_verified_tokens": 0,
-                "pll_remasked_tokens": 0,
-                "pll_changed_tokens": 0,
-                "pll_sum_pll_verified": 0.0,
-                "pll_sum_pll_remasked": 0.0,
+                "verify_calls": 0,
+                "verified_tokens": 0,
+                "remasked_tokens": 0,
+                "changed_tokens": 0,
+                "sum_verified": 0.0,
+                "sum_remasked": 0.0,
             }
 
         out = []
@@ -353,7 +355,7 @@ class LLaDAEvalHarness(LM):
 
                 mech_serializable = {}
                 for k, v in gen_mech.items():
-                    # Check if value is a list (standard for your code)
+                    # Check if value is a list
                     if isinstance(v, list):
                         # Convert each tensor item in the list to a standard number/list
                         mech_serializable[k] = [x.tolist() if torch.is_tensor(x) else x for x in v]
@@ -408,7 +410,6 @@ import time
 import argparse
 
 def parse_runner_args(argv):
-    # add_help=False so --help/-h still belongs to lm-eval
     p = argparse.ArgumentParser(add_help=False)
     p.add_argument("--llada_seed", type=int, default=None)
     args, remaining = p.parse_known_args(argv)

@@ -3,8 +3,6 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 
-from transformers import AutoTokenizer, AutoModel
-
 
 def add_gumbel_noise(logits, temperature):
     '''
@@ -61,7 +59,8 @@ def generate(
     x[:, :prompt.shape[1]] = prompt.clone()
 
     if attention_mask is not None:
-        attention_mask = torch.cat([attention_mask, torch.ones((prompt.shape[0], gen_length), dtype=attention_mask.dtype, device=model.device)], dim=-1)
+        attention_mask = torch.cat([attention_mask, torch.ones((prompt.shape[0], gen_length),
+                                                               dtype=attention_mask.dtype, device=model.device)], dim=-1)
 
     prompt_index = (x != mask_id)
     assert gen_length % block_length == 0
@@ -70,19 +69,19 @@ def generate(
     steps = steps // num_blocks
     
     stats = {
-        "CoRe_calls": 0,
-        "pll_verified_tokens": 0,
-        "pll_remasked_tokens": 0,
-        "pll_changed_tokens": 0,
-        "pll_sum_pll_verified": 0.0,
-        "pll_sum_pll_remasked": 0.0
+        "core_calls": 0,
+        "verified_tokens": 0,
+        "remasked_tokens": 0,
+        "changed_tokens": 0,
+        "core_sum_verified": 0.0,
+        "core_sum_remasked": 0.0
     }
 
     mech = {
-        "pll_verified_kept": [],
-        "pll_verified_remasked": [],
-        "pll_remasked_changed": [],
-        "pll_remasked_unchanged": [],
+        "core_verified_kept": [],
+        "core_verified_remasked": [],
+        "remasked_changed": [],
+        "remasked_unchanged": [],
         "delta_remasked": [],
         "margin_verified_kept": [],
         "margin_verified_remasked": []
@@ -169,13 +168,13 @@ def generate(
                 x0_p = top2_vals[..., 0] - top2_vals[..., 1]      # [B, L]
                 x0_prob = torch.squeeze(torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1)
 
-            elif remasking in ["CoRe", "margin_remask", "random_remask"]:
+            elif remasking in ["core", "margin_remask", "random_remask"]:
                 score_mode = remasking
                 base_masking = os.environ.get("BASE_MASKING", "confidence")
                 assert base_masking in ["confidence", "margin", "random"]
             
                 # --- knobs ---
-                pll_verify_every = int(os.environ.get("VERIFY_EVERY", "8")) # run verification every N inner steps (0 disables)
+                pll_verify_every = int(os.environ.get("REVISE_EVERY", "8")) # run revision every N inner steps (0 disables)
                 pll_candidate_m  = int(os.environ.get("CANDIDATE_M", "32")) # how many filled tokens to verify per sample when verifying
 
                 B, L = x.shape
@@ -204,7 +203,7 @@ def generate(
                 )
 
                 if verify_now:
-                    stats["CoRe_calls"] += 1
+                    stats["core_calls"] += 1
 
                     # Pick candidate tokens to verify (cheap) using margin under current logits
                     top2_vals, _ = p.topk(2, dim=-1)                # [B, L, 2]
@@ -237,7 +236,7 @@ def generate(
                         verify_mask1[b, cand_b[idx1]] = True
                     
                     verify_mask = verify_mask1
-                    stats["pll_verified_tokens"] += int(verify_mask.sum().item())
+                    stats["verified_tokens"] += int(verify_mask.sum().item())
 
                     def _run_verify_pass(x_in, verify_mask_local):
                         x_filled = x_in.clone()
@@ -287,8 +286,8 @@ def generate(
 
                     def _score_from_verify(score_mode, pll, p_ver, x0_ver, x0_prob_ver, x_filled):
                         # returns remask_score over ALL positions (not yet restricted to verify_mask)
-                        if score_mode == "CoRe":
-                            gate_p = float(os.environ.get("PLL_VERIFY_GATE_P", "0.3"))  # 0.0 disables gate
+                        if score_mode == "core":
+                            gate_p = float(os.environ.get("VERIFY_GATE_P", "0.3"))  # 0.0 disables gate
                             if gate_p > 0.0:
                                 wants_change = (x0_ver != x_filled)
                                 repl_conf_ok = (x0_prob_ver >= gate_p)
@@ -318,8 +317,8 @@ def generate(
                         pll1, x0_ver1, x0_p_ver1, x0_prob_ver1, p_ver1, x_filled1 = _run_verify_pass(x, verify_mask1)
 
                         # token-weighted verified PLL stats (only meaningful for pll_verify)
-                        if score_mode == "CoRe":
-                            stats["pll_sum_pll_verified"] += float(pll1[verify_mask1].sum().item())
+                        if score_mode == "core":
+                            stats["core_sum_verified"] += float(pll1[verify_mask1].sum().item())
 
                         remask_score1 = _score_from_verify(score_mode, pll1, p_ver1, x0_ver1, x0_prob_ver1, x_filled1)
                         remask_score1 = torch.where(
@@ -328,40 +327,10 @@ def generate(
                             torch.full_like(remask_score1, -float("inf"))
                         )
 
-                        # ---------------- Pass 2 (optional) ----------------
-                        remask_score2 = None
-                        if double_verify and (verify_mask2 is not None) and verify_mask2.any().item():
-                            pll2, x0_ver2, x0_p_ver2, x0_prob_ver2, p_ver2, x_filled2 = _run_verify_pass(x, verify_mask2)
-                            remask_score2 = _score_from_verify(score_mode, pll2, p_ver2, x0_ver2, x0_prob_ver2, x_filled2)
-                            remask_score2 = torch.where(
-                                verify_mask2,
-                                remask_score2,
-                                torch.full_like(remask_score2, -float("inf"))
-                            )
+                        remask_score = remask_score1
+                        verify_mask = verify_mask1
 
-                        # ---------------- Combine (double-pass gate) ----------------
-                        if double_verify and remask_score2 is not None:
-                            # Only allow remask where BOTH passes say it's eligible (finite)
-                            both = torch.isfinite(remask_score1) & torch.isfinite(remask_score2)
-
-                            # Conservative aggregation (must look bad in both)
-                            remask_score = torch.where(
-                                both,
-                                torch.minimum(remask_score1, remask_score2),
-                                torch.full_like(remask_score1, -float("inf"))
-                            )
-
-                            # IMPORTANT: downstream uses verify_mask for logging; define it as "eligible set"
-                            verify_mask = both
-                        else:
-                            remask_score = remask_score1
-                            verify_mask = verify_mask1
-
-                        # stats count: if you want "verified tokens" to mean pass1 only (stable), keep as-is:
-                        stats["pll_verified_tokens"] += int(verify_mask1.sum().item())
-                        # If you prefer counting both passes, uncomment:
-                        # if double_verify and verify_mask2 is not None:
-                        #     stats["pll_verified_tokens"] += int(verify_mask2.sum().item())
+                        stats["verified_tokens"] += int(verify_mask1.sum().item())
 
                         # ---------------- Choose up to remask_ratio * F_step positions to remask ----------------
                         for b in range(B):
@@ -396,9 +365,9 @@ def generate(
                             remask_counts[b] = k_remask
 
                         r = remask_index
-                        stats["pll_remasked_tokens"] += int(r.sum().item())
+                        stats["remasked_tokens"] += int(r.sum().item())
 
-                        # Use pass1 objects for refill and logging (safe; remask_score already gated)
+                        # Use pass1 objects for refill and logging
                         pll = pll1
                         p_ver = p_ver1
                         x0_ver = x0_ver1
@@ -406,9 +375,9 @@ def generate(
                         x0_prob_ver = x0_prob_ver1
                         x_filled = x_filled1
 
-                        if score_mode == "CoRe" and r.any().item():
-                            stats["pll_sum_pll_remasked"] += float(pll[r].sum().item())
-                            stats["pll_changed_tokens"] += int((x0_ver[r] != x_filled[r]).sum().item())
+                        if score_mode == "core" and r.any().item():
+                            stats["core_sum_remasked"] += float(pll[r].sum().item())
+                            stats["changed_tokens"] += int((x0_ver[r] != x_filled[r]).sum().item())
 
                         if remask_index.any().item():
                             for b in range(B):
@@ -423,17 +392,17 @@ def generate(
                         rem_mask  = verify_mask & remask_index
                         keep_mask = verify_mask & (~remask_index)
 
-                        _push_pair("pll_verified_kept", "margin_verified_kept",
+                        _push_pair("core_verified_kept", "margin_verified_kept",
                                 pll[keep_mask], margin[keep_mask])
 
-                        _push_pair("pll_verified_remasked", "margin_verified_remasked",
+                        _push_pair("core_verified_remasked", "margin_verified_remasked",
                                 pll[rem_mask], margin[rem_mask])
 
                         if rem_mask.any():
                             changed_mask = rem_mask & (x0_ver != x_filled)
                             unchanged_mask = rem_mask & (x0_ver == x_filled)
-                            _push("pll_remasked_changed", pll[changed_mask])
-                            _push("pll_remasked_unchanged", pll[unchanged_mask])
+                            _push("remasked_changed", pll[changed_mask])
+                            _push("remasked_unchanged", pll[unchanged_mask])
 
                             new_prob = torch.squeeze(
                                 torch.gather(p_ver, dim=-1, index=torch.unsqueeze(x0_ver, -1)),
@@ -501,15 +470,15 @@ def generate(
     gen_start = prompt.shape[1]
     assert (x[:, gen_start:] != mask_id).all(), "Some positions are still masked at the end of generation!"
     
-    if stats["CoRe_calls"] > 0:
-        calls = stats["CoRe_calls"]
-        avg_pll_verified = stats["pll_sum_pll_verified"] / max(1, stats["pll_verified_tokens"])
-        avg_pll_remasked = stats["pll_sum_pll_remasked"] / max(1, stats["pll_remasked_tokens"])
+    if stats["core_calls"] > 0:
+        calls = stats["core_calls"]
+        avg_pll_verified = stats["core_sum_verified"] / max(1, stats["verified_tokens"])
+        avg_pll_remasked = stats["core_sum_remasked"] / max(1, stats["remasked_tokens"])
         print(
             f"[pll_verify] calls={calls} "
-            f"verified/call={stats['pll_verified_tokens']/calls:.1f} "
-            f"remasked/call={stats['pll_remasked_tokens']/calls:.2f} "
-            f"changed/remasked={(stats['pll_changed_tokens']/max(1,stats['pll_remasked_tokens'])):.2f} "
+            f"verified/call={stats['verified_tokens']/calls:.1f} "
+            f"remasked/call={stats['remasked_tokens']/calls:.2f} "
+            f"changed/remasked={(stats['changed_tokens']/max(1,stats['remasked_tokens'])):.2f} "
             f"avg_pll_verified={avg_pll_verified:.3f} "
             f"avg_pll_remasked={avg_pll_remasked:.3f}"
         )
