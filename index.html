@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Primary Meta Tags -->
-  <meta name="title" content="CoRe: Context-Robust Remasking for Diffusion Language Models">
+  <meta name="title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
   <meta name="description"
-    content="CoRe is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
+    content="CORE is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
   <meta name="keywords"
     content="diffusion language models, masked diffusion models, inference-time revision, remasking, robustness, self-correction, LLaDA, code generation, reasoning">
   <meta name="author" content="Kevin Zhai, Sabbir Mollah, Zhenyi Wang, Mubarak Shah">
@@ -16,25 +16,25 @@
   <meta name="language" content="English">
 
   <!-- Canonical URL for GitHub Pages (update if you move domains) -->
-  <link rel="canonical" href="https://ucf-crcv.github.io/CoRe/">
+  <link rel="canonical" href="https://ucf-crcv.github.io/CORE/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="article">
-  <meta property="og:site_name" content="CoRe Project Page">
-  <meta property="og:title" content="CoRe: Context-Robust Remasking for Diffusion Language Models">
+  <meta property="og:site_name" content="CORE Project Page">
+  <meta property="og:title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
   <meta property="og:description"
-    content="CoRe is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
-  <meta property="og:url" content="https://ucf-crcv.github.io/CoRe/">
-  <meta property="og:image" content="https://ucf-crcv.github.io/CoRe/static/images/main_figure.png">
-  <meta property="og:image:alt" content="CoRe - Research Preview">
+    content="CORE is a training-free inference-time revision method for masked diffusion language models. It identifies context-brittle tokens via jointly-masked context perturbations and selectively remasks them.">
+  <meta property="og:url" content="https://ucf-crcv.github.io/CORE/">
+  <meta property="og:image" content="https://ucf-crcv.github.io/CORE/static/images/main_figure.png">
+  <meta property="og:image:alt" content="CORE - Research Preview">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CoRe: Context-Robust Remasking for Diffusion Language Models">
+  <meta name="twitter:title" content="CORE: Context-Robust Remasking for Diffusion Language Models">
   <meta name="twitter:description"
     content="Training-free inference-time revision for masked diffusion language models via jointly-masked context perturbations.">
-  <meta name="twitter:image" content="https://ucf-crcv.github.io/CoRe/static/images/main_figure.png">
-  <meta name="twitter:image:alt" content="CoRe - Research Preview">
+  <meta name="twitter:image" content="https://ucf-crcv.github.io/CORE/static/images/main_figure.png">
+  <meta name="twitter:image:alt" content="CORE - Research Preview">
 
   <!-- Additional SEO / UI -->
   <meta name="theme-color" content="#2563eb">
@@ -48,7 +48,7 @@
   <link rel="preconnect" href="https://ajax.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-  <title>CoRe: Context-Robust Remasking for Diffusion Language Models | Project Page</title>
+  <title>CORE: Context-Robust Remasking for Diffusion Language Models | Project Page</title>
 
   <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/amendment.png">
@@ -99,7 +99,7 @@
           <div class="columns is-centered">
             <div class="column has-text-centered">
 
-              <h1 class="title is-1 publication-title">CoRe: Context-Robust Remasking for Diffusion Language Models</h1>
+              <h1 class="title is-1 publication-title">CORE: Context-Robust Remasking for Diffusion Language Models</h1>
 
               <div class="is-size-5 publication-authors">
                 <!-- TODO: Replace with your paper authors and their personal links -->
@@ -139,7 +139,7 @@
                   -->
 
                   <span class="link-block">
-                    <a href="https://github.com/UCF-CRCV/CoRe" target="_blank"
+                    <a href="https://github.com/UCF-CRCV/CORE" target="_blank"
                       class="external-link button is-normal is-rounded is-dark">
                       <span class="icon"><i class="fab fa-github"></i></span>
                       <span>Code</span>
@@ -172,7 +172,7 @@
         <div class="hero-body">
           <img id="tree" src="static/images/main_figure.png" alt="Main figure" style="height:100%; width:auto;">
           <h2 class="subtitle has-text-centered">
-            CoRe is a training-free inference-time revision method for masked diffusion language models that identifies
+            CORE is a training-free inference-time revision method for masked diffusion language models that identifies
             context-brittle tokens by stress-testing them under jointly-masked context perturbations.
           </h2>
         </div>
@@ -192,11 +192,11 @@
                 creates cascade effects where initial inconsistencies misguide the remaining generation. Existing
                 revision strategies attempt to mitigate this by relying on static confidence scores, but these signals
                 are inherently myopic; inconsistent tokens frequently appear confident to the model itself. To address
-                this, we propose Context-Robust Remasking (CoRe), a training-free framework for inference-time revision.
+                this, we propose Context-Robust Remasking (CORE), a training-free framework for inference-time revision.
                 We introduce a new selection paradigm: rather than trusting static token probabilities, we identify
                 context-brittle tokens by probing their sensitivity to targeted perturbations. We formalize revision
-                as a robust optimization problem targeting worst-case context shifts. CoRe efficiently approximates this
-                objective to expose unstable tokens, prioritizing them for revision. On LLaDA-8B-Base, CoRe delivers
+                as a robust optimization problem targeting worst-case context shifts. CORE efficiently approximates this
+                objective to expose unstable tokens, prioritizing them for revision. On LLaDA-8B-Base, CORE delivers
                 consistent improvements across reasoning and code benchmarks, boosting performance on code generation
                 (MBPP) by up to +9.2%.
               </p>
@@ -338,7 +338,7 @@
 
             <div class="content">
               <p>
-                CoRe prioritizes tokens based on <b>context brittleness</b>: if the current token loses support under a
+                CORE prioritizes tokens based on <b>context brittleness</b>: if the current token loses support under a
                 jointly-masked perturbed context, it is a strong candidate for revision.
               </p>
 
@@ -355,7 +355,7 @@
                 <div class="box">
                   <h3 class="title is-5">Candidate Selection</h3>
                   <p>
-                    To control compute, CoRe restricts scoring to a small candidate set proposed by a cheap heuristic
+                    To control compute, CORE restricts scoring to a small candidate set proposed by a cheap heuristic
                     (e.g., top-2 margin), then applies a stronger robustness test only to those positions.
                   </p>
                 </div>
@@ -375,7 +375,7 @@
                 <div class="box">
                   <h3 class="title is-5">Instability Scoring</h3>
                   <p>
-                    CoRe ranks candidates by how well the <em>current</em> token is supported under the jointly-masked
+                    CORE ranks candidates by how well the <em>current</em> token is supported under the jointly-masked
                     perturbed context (the masked-context support signal).
                   </p>
                 </div>
@@ -406,9 +406,9 @@
 
             <div class="content">
               <p>
-                CoRe improves over the base sampler and shows its largest gains on structure-sensitive code benchmarks.
+                CORE improves over the base sampler and shows its largest gains on structure-sensitive code benchmarks.
                 Notably, the confidence-based baseline (ReMDM-conf) can degrade code performance under some unmasking
-                strategies, while CoRe yields consistent improvements on HumanEval and MBPP. On GSM8K, CoRe remains
+                strategies, while CORE yields consistent improvements on HumanEval and MBPP. On GSM8K, CORE remains
                 competitive and does not trade away reasoning accuracy for code gains.
               </p>
             </div>
@@ -446,7 +446,7 @@
                     <td class="has-text-centered">15.20</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered"><b>52.69</b></td>
                     <td class="has-text-centered"><b>17.06</b></td>
                     <td class="has-text-centered"><b>47.18</b><sup>*</sup></td>
@@ -475,7 +475,7 @@
                     <td class="has-text-centered">14.80</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered">51.40</td>
                     <td class="has-text-centered"><b>18.34</b></td>
                     <td class="has-text-centered"><b>49.01</b></td>
@@ -534,7 +534,7 @@
                     <td class="has-text-centered">17.40</td>
                   </tr>
                   <tr>
-                    <td>&nbsp;&nbsp;+ <b>CoRe (Ours)</b></td>
+                    <td>&nbsp;&nbsp;+ <b>CORE (Ours)</b></td>
                     <td class="has-text-centered"><b>52.69</b></td>
                     <td class="has-text-centered"><b>17.06</b></td>
                     <td class="has-text-centered"><b>47.18</b></td>
@@ -565,11 +565,11 @@
           </button>
         </div>
         <pre id="bibtex-code"><code>@misc{core2026,
-  title        = {CoRe: Context-Robust Remasking for Diffusion Language Models},
+  title        = {CORE: Context-Robust Remasking for Diffusion Language Models},
   author       = {Anonymous Authors},
   year         = {2026},
   note         = {ICML 2026 submission},
-  howpublished = {\url{https://ucf-crcv.github.io/CoRe/}}
+  howpublished = {\url{https://ucf-crcv.github.io/CORE/}}
 }</code></pre>
       </div>
     </section>
