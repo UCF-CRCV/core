@@ -53,7 +53,7 @@ def generate(
     mask_id=126336,
     logits_eos_inf=False,
     confidence_eos_eot_inf=False,
-    remask_ratio=0.25
+    remask_k=1
 ):
     x = torch.full((prompt.shape[0], prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
     x[:, :prompt.shape[1]] = prompt.clone()
@@ -171,11 +171,11 @@ def generate(
             elif remasking in ["core", "margin_remask", "random_remask"]:
                 score_mode = remasking
                 base_masking = os.environ.get("BASE_MASKING", "confidence")
-                assert base_masking in ["confidence", "margin", "random"]
+                assert base_masking in ["confidence", "margin"]
             
                 # --- knobs ---
-                pll_verify_every = int(os.environ.get("REVISE_EVERY", "8")) # run revision every N inner steps (0 disables)
-                pll_candidate_m  = int(os.environ.get("CANDIDATE_M", "32")) # how many filled tokens to verify per sample when verifying
+                revise_every = int(os.environ.get("REVISE_EVERY", "8")) # run revision every N inner steps (0 disables)
+                candidate_m  = int(os.environ.get("CANDIDATE_M", "32")) # how many filled tokens to verify per sample when verifying
 
                 B, L = x.shape
 
@@ -191,14 +191,12 @@ def generate(
                 elif base_masking == "margin":
                     top2_vals, _ = p.topk(2, dim=-1)
                     x0_p = top2_vals[..., 0] - top2_vals[..., 1]   # [B,L]
-                elif base_masking == "random":
-                    x0_p = torch.rand((B, L), device=x.device)
 
                 window_start = int(0.25 * steps)
                 window_end   = int(0.75 * steps)                    
                 verify_now = (
-                    (pll_verify_every is not None) and (pll_verify_every > 0)
-                    and (i % pll_verify_every == 0)
+                    (revise_every is not None) and (revise_every > 0)
+                    and (i % revise_every == 0)
                     and (window_start <= i < window_end)
                 )
 
@@ -217,19 +215,18 @@ def generate(
                     in_block[:, block_start:block_end] = True
 
                     k_protect = 16
-                        
                     protect = torch.zeros_like(x, dtype=torch.bool, device=x.device)
                     protect[:, max(block_start, block_end - k_protect):block_end] = True
 
                     candidates = (~mask_index) & in_block & (~prompt_index) & (~protect)
 
-                    # Build verify mask: choose up to pll_candidate_m positions per sample
+                    # Build verify mask: choose up to candidate_m positions per sample
                     verify_mask1 = torch.zeros_like(x, dtype=torch.bool, device=x.device)
                     for b in range(B):
                         cand_b = torch.nonzero(candidates[b], as_tuple=False).squeeze(-1)
                         if cand_b.numel() == 0:
                             continue
-                        m = min(int(pll_candidate_m), int(cand_b.numel()))
+                        m = min(int(candidate_m), int(cand_b.numel()))
                         scores_b = pick_score[b, cand_b]
                         
                         _, idx1 = torch.topk(scores_b, k=m)
@@ -287,17 +284,13 @@ def generate(
                     def _score_from_verify(score_mode, pll, p_ver, x0_ver, x0_prob_ver, x_filled):
                         # returns remask_score over ALL positions (not yet restricted to verify_mask)
                         if score_mode == "core":
-                            gate_p = float(os.environ.get("VERIFY_GATE_P", "0.3"))  # 0.0 disables gate
-                            if gate_p > 0.0:
-                                wants_change = (x0_ver != x_filled)
-                                repl_conf_ok = (x0_prob_ver >= gate_p)
-                                remask_score = torch.where(
-                                    wants_change & repl_conf_ok,
-                                    -pll,
-                                    torch.full_like(pll, -float("inf"))
-                                )
-                            else:
-                                remask_score = -pll
+                            wants_change = (x0_ver != x_filled)
+                            repl_conf_ok = (x0_prob_ver >= 0.3)
+                            remask_score = torch.where(
+                                wants_change & repl_conf_ok,
+                                -pll,
+                                torch.full_like(pll, -float("inf"))
+                            )
 
                         elif score_mode == "margin_remask":
                             top2v, _ = p_ver.topk(2, dim=-1)
@@ -316,7 +309,7 @@ def generate(
                         # ---------------- Pass 1 (original behavior) ----------------
                         pll1, x0_ver1, x0_p_ver1, x0_prob_ver1, p_ver1, x_filled1 = _run_verify_pass(x, verify_mask1)
 
-                        # token-weighted verified PLL stats (only meaningful for pll_verify)
+                        # token-weighted verified PLL stats (only meaningful for revise)
                         if score_mode == "core":
                             stats["core_sum_verified"] += float(pll1[verify_mask1].sum().item())
 
@@ -332,20 +325,13 @@ def generate(
 
                         stats["verified_tokens"] += int(verify_mask1.sum().item())
 
-                        # ---------------- Choose up to remask_ratio * F_step positions to remask ----------------
+                        # ---------------- Choose up to remask_k positions to remask ----------------
                         for b in range(B):
                             F_step = int(num_transfer_tokens[b, i].item())
                             if F_step <= 0:
                                 continue
 
-                            if F_step == 1:
-                                max_remask = 1 if torch.rand((), device=x.device) < remask_ratio else 0
-                            else:
-                                raw = remask_ratio * F_step
-                                base = int(raw)
-                                frac = raw - base
-                                max_remask = base + (1 if torch.rand((), device=x.device) < frac else 0)
-
+                            max_remask = min(remask_k, F_step)
                             if max_remask <= 0:
                                 continue
 
@@ -360,7 +346,8 @@ def generate(
                             if k_remask <= 0:
                                 continue
 
-                            _, idx = torch.topk(scores_b, k=k_remask)
+                            masked_scores = scores_b.masked_fill(~finite, float("-inf"))
+                            _, idx = torch.topk(masked_scores, k=k_remask)
                             remask_index[b, idx] = True
                             remask_counts[b] = k_remask
 
@@ -443,8 +430,6 @@ def generate(
                     continue
 
                 # 1) Force-commit ONLY remasked positions whose replacement is confident.
-                # IMPORTANT: x0_p at remasked positions was set to x0_p_ver earlier via:
-                #   x0_p = torch.where(remask_index, x0_p_ver, x0_p)
                 force_ok = rmask_j & torch.isfinite(x0_prob[j])
                 transfer_index[j, force_ok] = True
                 forced = int(force_ok.sum().item())
@@ -475,7 +460,7 @@ def generate(
         avg_pll_verified = stats["core_sum_verified"] / max(1, stats["verified_tokens"])
         avg_pll_remasked = stats["core_sum_remasked"] / max(1, stats["remasked_tokens"])
         print(
-            f"[pll_verify] calls={calls} "
+            f"[revise] calls={calls} "
             f"verified/call={stats['verified_tokens']/calls:.1f} "
             f"remasked/call={stats['remasked_tokens']/calls:.2f} "
             f"changed/remasked={(stats['changed_tokens']/max(1,stats['remasked_tokens'])):.2f} "
@@ -483,6 +468,6 @@ def generate(
             f"avg_pll_remasked={avg_pll_remasked:.3f}"
         )
     else:
-        print('pll_verify_calls is zero')
+        print('revise_calls is zero')
     
     return x, stats, mech
