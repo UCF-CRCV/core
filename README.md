@@ -1,6 +1,6 @@
 # CORE: Context-Robust Remasking for Diffusion Language Models
 
-[![arXiv](https://img.shields.io/badge/Paper-arXiv-red.svg)](https://arxiv.org/abs/2510.01549)
+[![arXiv](https://img.shields.io/badge/Paper-arXiv-red.svg)](https://arxiv.org/abs/2602.04096)
 
 ```bash
 bash run_all.sh
