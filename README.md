@@ -1,5 +1,8 @@
 # CORE: Context-Robust Remasking for Diffusion Language Models
 
+[![arXiv](https://img.shields.io/badge/arXiv-2602.04096-b31b1b.svg)](https://arxiv.org/abs/2602.04096)
+[![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://ucf-crcv.github.io/core/)
+
 ```bash
 bash run_all.sh
 ```
@@ -8,7 +11,7 @@ bash run_all.sh
 If you use this code or find the paper useful, please cite:
 ```bibtex
 @misc{zhai2026corecontextrobustremaskingdiffusion,
-      title={CoRe: Context-Robust Remasking for Diffusion Language Models}, 
+      title={CORE: Context-Robust Remasking for Diffusion Language Models}, 
       author={Kevin Zhai and Sabbir Mollah and Zhenyi Wang and Mubarak Shah},
       year={2026},
       eprint={2602.04096},
