@@ -166,10 +166,28 @@
       <div class="container is-max-desktop">
         <div class="hero-body">
           <img id="tree" src="static/images/main_figure.png" alt="Main figure" style="height:100%; width:auto;">
-          <h2 class="subtitle has-text-centered" style="padding-top: 1em;">
-            CORE is a training-free inference-time revision method for masked diffusion language models that identifies
-            context-brittle tokens by stress-testing them under jointly-masked context perturbations.
-          </h2>
+          
+          <div class="content has-text-left" style="padding-top: 1.5em;">
+            <h3 class="title is-4 has-text-centered">CORE in Action</h3>
+            <p>
+              The figure illustrates a single revision step where the model corrects a grammatical error.
+            </p>
+            <ol>
+              <li>
+                <strong>Selection:</strong> CORE identifies tokens generated early with limited context, highlighted in the red dashed box.
+              </li>
+              <li>
+                <strong>Stress-Testing:</strong> We mask these tokens to create a <strong>Perturbed Context</strong>. This forces the model to re-evaluate them without bias from its previous errors.
+              </li>
+              <li>
+                <strong>Instability Scoring:</strong> We measure if the token changes under this new context. Here, the token <em>"a"</em> collapses because the surrounding context implies the next word should be <em>"an"</em>.
+              </li>
+              <li>
+                <strong>Revision:</strong> The unstable token is updated to <em>"an"</em> and merged with the standard parallel decoding, resulting in the coherent phrase <em>"an icy dwarf"</em>.
+              </li>
+            </ol>
+          </div>
+
         </div>
       </div>
     </section>
