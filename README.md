@@ -1,5 +1,8 @@
 # CORE: Context-Robust Remasking for Diffusion Language Models
 
+**Kevin Zhai, Sabbir Mollah, Zhenyi Wang, Mubarak Shah**  
+University of Central Florida
+
 [![arXiv](https://img.shields.io/badge/arXiv-2602.04096-b31b1b.svg)](https://arxiv.org/abs/2602.04096)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://ucf-crcv.github.io/core/)
 
@@ -10,7 +13,7 @@ bash run_all.sh
 ## Citation
 If you use this code or find the paper useful, please cite:
 ```bibtex
-@misc{zhai2026corecontextrobustremaskingdiffusion,
+@article{zhai2026corecontextrobustremaskingdiffusion,
       title={CORE: Context-Robust Remasking for Diffusion Language Models}, 
       author={Kevin Zhai and Sabbir Mollah and Zhenyi Wang and Mubarak Shah},
       year={2026},
