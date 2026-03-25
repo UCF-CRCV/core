@@ -397,7 +397,7 @@ def generate(
                             )
                             pll_new = torch.log(new_prob + 1e-10)
                             delta = pll_new - pll
-                            _push("delta_remasked", delta[rem_mask]))
+                            _push("delta_remasked", delta[rem_mask])
 
                         # --- refill remasked tokens using masked-context logits (pass1) ---
                         x0   = torch.where(remask_index, x0_ver, x0)
