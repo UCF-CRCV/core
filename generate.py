@@ -397,7 +397,7 @@ def generate(
                             )
                             pll_new = torch.log(new_prob + 1e-10)
                             delta = pll_new - pll
-                            _push("delta_remasked", delta[rem_mask])
+                            _push("delta_remasked", delta[rem_mask]))
 
                         # --- refill remasked tokens using masked-context logits (pass1) ---
                         x0   = torch.where(remask_index, x0_ver, x0)
@@ -406,6 +406,55 @@ def generate(
 
                         x[remask_index] = mask_id
                         mask_index = (x == mask_id)
+
+                        # =================================================================
+                        # ADDITION: ABLATION FOR JOINT RE-EVALUATION (KQ4)
+                        # Run a new forward pass on the corrected context to get fresh 
+                        # scores for the remaining masked tokens before the transfer step.
+                        # =================================================================
+                        do_joint_reeval = os.environ.get("JOINT_REEVAL", "0") == "1"
+                        if do_joint_reeval and remask_index.any().item():
+                            # 1. Temporarily apply the forced revisions to x to act as the updated context
+                            force_ok_mask = remask_index & torch.isfinite(x0_prob_ver)
+                            x_joint = x.clone()
+                            x_joint[force_ok_mask] = x0_ver[force_ok_mask]
+
+                            # 2. Run the extra forward pass (adding 1 NFE per revision step)
+                            if cfg_scale > 0.:
+                                un_x_j = x_joint.clone()
+                                un_x_j[prompt_index] = mask_id
+                                x_j_cat = torch.cat([x_joint, un_x_j], dim=0)
+                                att_j_cat = torch.cat([attention_mask, attention_mask], dim=0) if attention_mask is not None else None
+                                logits_j_cat = model(x_j_cat, attention_mask=att_j_cat).logits
+                                logits_j_c, un_logits_j = torch.chunk(logits_j_cat, 2, dim=0)
+                                logits_joint = un_logits_j + (cfg_scale + 1) * (logits_j_c - un_logits_j)
+                            else:
+                                logits_joint = model(x_joint, attention_mask=attention_mask).logits
+
+                            if logits_eos_inf:
+                                logits_joint[:, :, 126081] = -torch.inf
+                            if confidence_eos_eot_inf:
+                                logits_joint[:, :, 126081] = -torch.inf
+                                logits_joint[:, :, 126348] = -torch.inf
+
+                            p_joint = F.softmax(logits_joint, dim=-1)
+                            logits_with_noise_joint = add_gumbel_noise(logits_joint, temperature=temperature)
+                            x0_joint = torch.argmax(logits_with_noise_joint, dim=-1)
+
+                            if base_masking == "confidence":
+                                x0_p_joint = torch.squeeze(torch.gather(p_joint, dim=-1, index=torch.unsqueeze(x0_joint, -1)), -1)
+                            elif base_masking == "margin":
+                                top2v_j, _ = p_joint.topk(2, dim=-1)
+                                x0_p_joint = top2v_j[..., 0] - top2v_j[..., 1]
+                            elif base_masking == "random":
+                                x0_p_joint = torch.rand((B, L), device=x.device)
+
+                            # 3. Overwrite the cached distributions ONLY for the remaining masked tokens.
+                            # We leave the just-remasked tokens alone because they already have forced scores.
+                            is_remaining_masked = mask_index & (~remask_index)
+                            x0 = torch.where(is_remaining_masked, x0_joint, x0)
+                            x0_p = torch.where(is_remaining_masked, x0_p_joint, x0_p)
+                        # =================================================================
 
             else:
                 raise NotImplementedError(remasking)
