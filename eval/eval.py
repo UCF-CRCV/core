@@ -19,6 +19,7 @@ from lm_eval.api.model import LM
 from lm_eval.api.registry import register_model
 from lm_eval.models.utils import get_dtype
 from lm_eval.__main__ import cli_evaluate
+from core_remask_hook import DreamCoreRemaskHook
 
 eval_logger = logging.getLogger(__name__)
 T = TypeVar("T", bound="LM")
@@ -49,6 +50,17 @@ class Dream(LM):
         alg: Optional[str] = "entropy",
         alg_temp: Optional[float] = 0.0,
         escape_until: Optional[bool] = False,
+        core_style: Optional[bool] = False,
+        block_length: Optional[int] = None,
+        cfg_scale: Optional[float] = 0.0,
+        remask_k: Optional[int] = 1,
+        revise_every: Optional[int] = 8,
+        candidate_m: Optional[int] = 32,
+        base_masking: Optional[str] = "confidence",
+        joint_reeval: Optional[bool] = False,
+        logits_eos_inf: Optional[bool] = False,
+        confidence_eos_eot_inf: Optional[bool] = False,
+        eot_token_id: Optional[int] = None,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -170,6 +182,17 @@ class Dream(LM):
         self.alg = alg
         self.alg_temp = alg_temp
         self.escape_until = escape_until
+        self.core_style = core_style
+        self.block_length = block_length or max_new_tokens
+        self.cfg_scale = cfg_scale
+        self.remask_k = remask_k
+        self.revise_every = revise_every
+        self.candidate_m = candidate_m
+        self.base_masking = base_masking
+        self.joint_reeval = joint_reeval
+        self.logits_eos_inf = logits_eos_inf
+        self.confidence_eos_eot_inf = confidence_eos_eot_inf
+        self.eot_token_id = eot_token_id
 
         # loglikelihood params
         self.nll_type = nll_type
@@ -258,27 +281,66 @@ class Dream(LM):
             prompts = [self.tokenizer.bos_token + p for p in prompts]
         # tokenize
         prompt_ids = self.tokenizer(prompts, return_tensors="pt", padding=True, padding_side="left").input_ids
-        if len(prompt_ids) > self.max_length-self.max_new_tokens:
-            eval_logger.warning(f"Prompt length {len(prompt_ids)} is larger than {self.max_length-self.max_new_tokens}, cutoff on the left side")
-            prompt_ids = prompt_ids[-(self.max_length-self.max_new_tokens):]
+        prompt_seq_len = prompt_ids.shape[1]
+        if prompt_seq_len > self.max_length-self.max_new_tokens:
+            eval_logger.warning(
+                f"Prompt length {prompt_seq_len} is larger than {self.max_length-self.max_new_tokens}, cutoff on the left side"
+            )
+            prompt_ids = prompt_ids[:, -(self.max_length-self.max_new_tokens):]
 
         attn_mask = prompt_ids.ne(self.tokenizer.pad_token_id)
         prompt_ids = prompt_ids.to(device=self.device)
         attn_mask = attn_mask.to(device=self.device)
 
-        generation_ids = self.model.diffusion_generate(
-            prompt_ids,
-            attention_mask=attn_mask,
-            max_new_tokens=self.max_new_tokens,
-            output_history=False,
-            return_dict_in_generate=True,
-            steps=self.diffusion_steps,
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            alg=self.alg,
-            alg_temp=self.alg_temp,
-        )
+        if self.core_style:
+            core_hook = DreamCoreRemaskHook(
+                self.model,
+                input_width=prompt_ids.shape[1],
+                max_length=prompt_ids.shape[1] + self.max_new_tokens,
+                prompt_attention_mask=attn_mask,
+                mask_token_id=self.tokenizer.mask_token_id,
+                temperature=self.temperature,
+                cfg_scale=self.cfg_scale,
+                remasking=self.alg,
+                logits_eos_inf=self.logits_eos_inf,
+                confidence_eos_eot_inf=self.confidence_eos_eot_inf,
+                remask_k=self.remask_k,
+                revise_every=self.revise_every,
+                candidate_m=self.candidate_m,
+                base_masking=self.base_masking,
+                joint_reeval=self.joint_reeval,
+                eos_token_id=self.tokenizer.eos_token_id,
+                eot_token_id=self.eot_token_id,
+                total_steps=self.diffusion_steps,
+            )
+            generation_ids = self.model.diffusion_generate(
+                prompt_ids,
+                attention_mask=attn_mask,
+                max_new_tokens=self.max_new_tokens,
+                output_history=False,
+                return_dict_in_generate=True,
+                steps=self.diffusion_steps,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                top_k=self.top_k,
+                alg="entropy",
+                alg_temp=self.alg_temp,
+                generation_tokens_hook_func=core_hook,
+            )
+        else:
+            generation_ids = self.model.diffusion_generate(
+                prompt_ids,
+                attention_mask=attn_mask,
+                max_new_tokens=self.max_new_tokens,
+                output_history=False,
+                return_dict_in_generate=True,
+                steps=self.diffusion_steps,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                top_k=self.top_k,
+                alg=self.alg,
+                alg_temp=self.alg_temp,
+            )
 
         # decode
         responses = [
