@@ -3,6 +3,10 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 
+# Gate verbose per-step/per-token debug prints in the decode loop behind an env flag.
+# Set CORE_DEBUG=1 to re-enable; off by default to avoid flooding eval logs.
+_CORE_DEBUG = os.environ.get("CORE_DEBUG", "0") == "1"
+
 
 def add_gumbel_noise(logits, temperature):
     '''
@@ -337,7 +341,8 @@ def generate(
 
                             scores_b = remask_score[b]
                             finite = torch.isfinite(scores_b)
-                            print(f"[budget] step={i} b={b} F_step={F_step} max_remask={max_remask} finite={int(finite.sum().item())}")
+                            if _CORE_DEBUG:
+                                print(f"[budget] step={i} b={b} F_step={F_step} max_remask={max_remask} finite={int(finite.sum().item())}")
 
                             if not finite.any():
                                 continue
@@ -366,7 +371,7 @@ def generate(
                             stats["core_sum_remasked"] += float(pll[r].sum().item())
                             stats["changed_tokens"] += int((x0_ver[r] != x_filled[r]).sum().item())
 
-                        if remask_index.any().item():
+                        if _CORE_DEBUG and remask_index.any().item():
                             for b in range(B):
                                 idxs = torch.nonzero(remask_index[b], as_tuple=False).squeeze(-1).tolist()
                                 for pos in idxs:

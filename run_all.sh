@@ -16,10 +16,12 @@ declare -a METHODS=("low_confidence" "core")
 
 case "${MODE}" in
     main_results)
-        for entry in "${DATASETS[@]}"; do
-            read -r TASK FEWSHOT <<< "${entry}"
-            echo "[Main Results] Running ${TASK} with ${FEWSHOT} few-shot examples"
-            bash run.sh "${TASK}" "NUM_FEWSHOT=${FEWSHOT}"
+        for METHOD in "${METHODS[@]}"; do
+            for entry in "${DATASETS[@]}"; do
+                read -r TASK FEWSHOT <<< "${entry}"
+                echo "[Main Results] method=${METHOD} task=${TASK} fewshot=${FEWSHOT}"
+                METHOD="${METHOD}" NUM_FEWSHOT="${FEWSHOT}" bash run.sh "${TASK}"
+            done
         done
         ;;
 
