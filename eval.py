@@ -94,12 +94,12 @@ class LLaDAEvalHarness(LM):
 
         # Don't use accelerator.prepare() when using device_map
         if self.accelerator is not None:
-            self.device = torch.device(f'cuda:{self.accelerator.process_index}')
+            self._set_device(torch.device(f'cuda:{self.accelerator.process_index}'))
             self._rank = self.accelerator.local_process_index
             self._world_size = self.accelerator.num_processes
         else: 
             self.model = self.model.to(device)
-            self.device = torch.device(device)
+            self._set_device(torch.device(device))
             self._rank = 0
             self._world_size = 1
 
@@ -130,6 +130,16 @@ class LLaDAEvalHarness(LM):
     @property
     def world_size(self):
         return self._world_size
+
+    def _set_device(self, dev):
+        # Backwards/forwards compatible across lm-eval versions: older releases
+        # exposed `device` as a writable attribute; newer ones make it a
+        # read-only property backed by `self._device`. Try the direct set first,
+        # and fall back to the private backing field if `device` is read-only.
+        try:
+            self.device = dev
+        except AttributeError:
+            self._device = dev
     
     def __getstate__(self):
         # Don't pickle the model or tokenizer
