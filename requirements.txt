@@ -1,0 +1,39 @@
+# CORE — pinned dependencies (verified working on dlm env, 2026-06-08)
+# Python 3.12 (3.12.3). Model: GSAI-ML/LLaDA-8B-Base.
+#
+# Install notes:
+#   1) torch is the CUDA build. Install it from the PyTorch CUDA index, e.g.:
+#        pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+#      (resolved to a cu13x build on the A100/driver-580 box; cpu build works for non-GPU.)
+#   2) Then install the rest:  pip install -r requirements.txt
+#
+# Compatibility (learned the hard way):
+#   - transformers MUST be 4.46.x — LLaDA's trust_remote_code modeling file predates
+#     the transformers 5.x loader refactor (5.8.0 fails with
+#     'LLaDAModelLM object has no attribute all_tied_weights_keys'). The checkpoint's
+#     config.json was authored with transformers 4.46.3.
+#   - lm-eval 0.4.x makes LM.device a read-only property; eval.py uses a _set_device()
+#     shim to stay compatible across versions.
+
+# --- core runtime ---
+torch==2.11.0           # install from the cu12x/cu13x index (see note above)
+transformers==4.46.3    # REQUIRED for LLaDA remote code; do NOT use 5.x
+tokenizers==0.20.3
+huggingface-hub==0.36.2
+accelerate==1.13.0
+numpy==2.4.6
+tqdm==4.68.1
+safetensors==0.7.0
+
+# --- evaluation harness + task deps ---
+lm-eval==0.4.12
+datasets==4.8.5
+evaluate==0.4.6
+math-verify==0.9.0      # MATH / minerva_math answer equivalence
+scikit-learn==1.9.0
+nltk==3.9.4
+sacrebleu==2.6.0
+rouge-score==0.1.2
+sympy==1.14.0
+pytablewriter==1.2.1
+word2number==1.1
