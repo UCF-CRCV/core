@@ -6,12 +6,7 @@ University of Central Florida
 [![arXiv](https://img.shields.io/badge/arXiv-2602.04096-b31b1b.svg)](https://arxiv.org/abs/2602.04096)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://ucf-crcv.github.io/core/)
 
-CORE is a training-free, inference-time revision method for Masked Diffusion Models. Standard
-decoders freeze a token once it is unmasked, even when later context exposes it as wrong. Instead
-of trusting static/stale confidence, CORE identifies *context-brittle* tokens by stress-testing
-them: it masks a small candidate set, measures each token's instability (drop in likelihood) under
-that perturbed context, and remasks the most unstable ones for resampling. The method plugs into the
-LLaDA sampler and adds only a handful of extra forward passes.
+CORE is a training-free, inference-time revision method for Masked Diffusion Models. Standard decoders freeze a token once it is unmasked, even when later context exposes it as wrong. Instead of trusting static/stale confidence, CORE identifies *context-brittle* tokens by stress-testing them: it masks a small candidate set, measures each token's instability (drop in likelihood) under that perturbed context, and remasks the most unstable ones for resampling. The method plugs into the LLaDA/Dream sampler and adds only a handful of extra forward passes.
 
 ## Setup
 
@@ -103,14 +98,13 @@ Revision is active only in the intermediate step window `[0.25, 0.75)` and revis
 ## Citation
 If you use this code or find the paper useful, please cite:
 ```bibtex
-@article{zhai2026corecontextrobustremaskingdiffusion,
-      title={CORE: Context-Robust Remasking for Diffusion Language Models}, 
-      author={Kevin Zhai and Sabbir Mollah and Zhenyi Wang and Mubarak Shah},
-      year={2026},
-      eprint={2602.04096},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2602.04096}, 
+@inproceedings{
+  zhai2026core,
+  title={{CORE}: Context-Robust Remasking for Diffusion Language Models},
+  author={Kevin Zhai and Sabbir Mollah and Zhenyi Wang and Mubarak Shah},
+  booktitle={Forty-third International Conference on Machine Learning},
+  year={2026},
+  url={https://openreview.net/forum?id=bmKHxLWkz9}
 }
 ```
 
