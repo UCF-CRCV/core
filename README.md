@@ -98,8 +98,7 @@ Revision is active only in the intermediate step window `[0.25, 0.75)` and revis
 ## Citation
 If you use this code or find the paper useful, please cite:
 ```bibtex
-@inproceedings{
-  zhai2026core,
+@inproceedings{zhai2026core,
   title={{CORE}: Context-Robust Remasking for Diffusion Language Models},
   author={Kevin Zhai and Sabbir Mollah and Zhenyi Wang and Mubarak Shah},
   booktitle={Forty-third International Conference on Machine Learning},
